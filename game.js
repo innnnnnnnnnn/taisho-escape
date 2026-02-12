@@ -10,12 +10,15 @@ const btnInteract = $('#btnInteract');
 const btnNotes = $('#btnNotes');
 const btnInv = $('#btnInv');
 const btnMute = $('#btnMute');
+const btnCredits = $('#btnCredits');
 const btnReset = $('#btnReset');
 
 const panelNotes = $('#panelNotes');
 const panelInv = $('#panelInv');
+const panelCredits = $('#panelCredits');
 const closeNotes = $('#closeNotes');
 const closeInv = $('#closeInv');
+const closeCredits = $('#closeCredits');
 const notesEl = $('#notes');
 const invEl = $('#inv');
 
@@ -84,8 +87,10 @@ function closePanel(el){
 
 btnNotes.addEventListener('click', ()=> openPanel(panelNotes));
 btnInv.addEventListener('click', ()=> { renderInv(); openPanel(panelInv); });
+btnCredits.addEventListener('click', ()=> openPanel(panelCredits));
 closeNotes.addEventListener('click', ()=> closePanel(panelNotes));
 closeInv.addEventListener('click', ()=> closePanel(panelInv));
+closeCredits.addEventListener('click', ()=> closePanel(panelCredits));
 
 btnReset.addEventListener('click', ()=>{
   if(!confirm('重置存檔與進度？')) return;
@@ -146,9 +151,37 @@ const keyLight = new THREE.DirectionalLight(0xffe2b6, 0.65);
 keyLight.position.set(2, 5, 3);
 scene.add(keyLight);
 
-// Room geometry (placeholder: 3 rooms as boxes connected)
-const matWall = new THREE.MeshStandardMaterial({ color: 0x101826, roughness: 0.95, metalness: 0.0 });
-const matFloor = new THREE.MeshStandardMaterial({ color: 0x0a0b10, roughness: 1.0, metalness: 0.0 });
+// Room geometry (placeholder; stylized toward Taisho-era Japanese house)
+const matWall = new THREE.MeshStandardMaterial({ color: 0x111521, roughness: 0.95, metalness: 0.0 });
+
+// simple procedural tatami texture
+function makeTatamiTexture(){
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  const x = c.getContext('2d');
+  x.fillStyle = '#6d7a56';
+  x.fillRect(0,0,256,256);
+  // weave lines
+  x.globalAlpha = 0.14;
+  x.fillStyle = '#2b2f24';
+  for(let i=0;i<256;i+=4){ x.fillRect(i,0,1,256); }
+  x.globalAlpha = 0.10;
+  x.fillStyle = '#a9b58a';
+  for(let i=0;i<256;i+=9){ x.fillRect(0,i,256,1); }
+  x.globalAlpha = 1;
+  // border bands
+  x.fillStyle = '#2a2b31';
+  x.fillRect(0,0,256,10);
+  x.fillRect(0,246,256,10);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2,2);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const tatamiTex = makeTatamiTexture();
+const matFloor = new THREE.MeshStandardMaterial({ map: tatamiTex, roughness: 1.0, metalness: 0.0 });
 
 function addRoom({x,z,w,d,h=3}){
   // floor
@@ -179,6 +212,19 @@ function addRoom({x,z,w,d,h=3}){
 addRoom({x:0, z:3, w:6, d:6});
 addRoom({x:0, z:-4, w:6, d:6});
 addRoom({x:0, z:-11, w:6, d:6});
+
+// shoji-like panels for vibe
+const shojiMat = new THREE.MeshStandardMaterial({ color: 0xe7e1cf, roughness: 0.9, metalness: 0.0, emissive: 0x222016, emissiveIntensity: 0.25 });
+function addShoji(x,y,z,w=1.4,h=2.1,rotY=0){
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), shojiMat);
+  m.position.set(x,y,z);
+  m.rotation.y = rotY;
+  scene.add(m);
+}
+addShoji(-2.9,1.1, 2.2, 1.8,2.1, Math.PI/2);
+addShoji( 2.9,1.1, 2.2, 1.8,2.1,-Math.PI/2);
+addShoji(-2.9,1.1,-4.8, 1.8,2.1, Math.PI/2);
+addShoji( 2.9,1.1,-4.8, 1.8,2.1,-Math.PI/2);
 
 // Doorways (holes not cut yet; we just place "portal" triggers)
 
@@ -371,6 +417,7 @@ function doInteract(){
   // if any panel is open, close first
   if(panelNotes.getAttribute('aria-hidden')==='false'){ closePanel(panelNotes); return; }
   if(panelInv.getAttribute('aria-hidden')==='false'){ closePanel(panelInv); return; }
+  if(panelCredits.getAttribute('aria-hidden')==='false'){ closePanel(panelCredits); return; }
 
   // ray from center
   tmp.set(0,0);
