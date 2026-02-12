@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>古宅密室脫逃（3D）</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="wrap" class="wrap">
+    <canvas id="c"></canvas>
+
+    <!-- Top HUD -->
+    <div class="hud">
+      <div class="hud-left">
+        <div id="objective" class="pill">目標：找出離開古宅的方法</div>
+        <div id="msg" class="pill pill-muted">點一下畫面開始</div>
+      </div>
+      <div class="hud-right">
+        <button id="btnInteract" class="btn">互動</button>
+        <button id="btnNotes" class="btn">筆記</button>
+        <button id="btnInv" class="btn">背包</button>
+        <button id="btnMute" class="btn">音樂</button>
+        <button id="btnReset" class="btn btn-danger">重置</button>
+      </div>
+    </div>
+
+    <!-- Crosshair (desktop) -->
+    <div id="cross" class="cross" aria-hidden="true"></div>
+
+    <!-- Mobile controls -->
+    <div id="mobile" class="mobile" aria-hidden="false">
+      <div class="stick" id="stick">
+        <div class="stick-base"></div>
+        <div class="stick-knob" id="knob"></div>
+      </div>
+      <div class="touchpad" id="touchpad"></div>
+    </div>
+
+    <!-- Panels -->
+    <div id="panelNotes" class="panel" aria-hidden="true">
+      <div class="panel-hd">
+        <div class="panel-title">筆記</div>
+        <button class="btn" id="closeNotes">關閉</button>
+      </div>
+      <textarea id="notes" class="textarea" placeholder="記下線索、推理、懷疑對象...（自動保存）"></textarea>
+    </div>
+
+    <div id="panelInv" class="panel" aria-hidden="true">
+      <div class="panel-hd">
+        <div class="panel-title">背包</div>
+        <button class="btn" id="closeInv">關閉</button>
+      </div>
+      <div id="inv" class="inv"></div>
+    </div>
+
+    <div id="hint" class="hint" aria-hidden="true">
+      <div class="hint-card">
+        <div id="hintText" class="hint-text"></div>
+        <button id="hintClose" class="btn">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
